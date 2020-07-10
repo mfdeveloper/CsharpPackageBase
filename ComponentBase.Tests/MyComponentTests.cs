@@ -12,7 +12,8 @@ namespace ComponentBase.Tests
         [Test]
         public void Test1()
         {
-            Assert.Pass();
+            var obj = new MyComponent();
+            Assert.AreEqual(obj.Method(), "This is a method");
         }
     }
 }

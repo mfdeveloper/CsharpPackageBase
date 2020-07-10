@@ -8,7 +8,7 @@
             "name": ".NET Core Launch (console)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build tests",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/ComponentBase.Tests/bin/Debug/netcoreapp3.1/ComponentBase.Tests.dll",
             "args": [],
