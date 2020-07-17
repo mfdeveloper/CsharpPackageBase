@@ -1,0 +1,108 @@
+# .NET Desktop/.NET Standard libraries
+# Build and run tests for .NET Desktop or Windows classic desktop solutions.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+trigger:
+  branches:
+    include:
+      - master
+      - refs/tags/*
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  feed: 'optiblast'
+
+stages:
+  - stage: Test
+    displayName: Run tests
+    jobs:
+      - job: UnitTest
+        displayName: Unit tests
+        steps:
+          - task: VSTest@2
+            inputs:
+              platform: '$(buildPlatform)'
+              configuration: '$(buildConfiguration)'
+  - stage: Build
+    displayName: Build .dll's
+    jobs:
+      - job: Build
+        displayName: DotNetCore build
+        steps:
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'build'
+              configuration: '$(buildConfiguration)'
+  - stage: GeneratePackage
+    displayName: Create Nuget .nupkg package
+    dependsOn: Build
+    condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+    jobs:
+      - job: Pack
+        displayName: DotNetCore build
+        steps:
+          - task: PowerShell@2
+            displayName: Set last tag to environment variable
+            inputs:
+              targetType: 'inline'
+              script: |
+                $VERSION_TAG = git describe --tags (git rev-list --tags --max-count=1)
+                Write-Host("##vso[task.setvariable variable=VERSION_TAG]$VERSION_TAG")
+                Write-Host("##vso[build.addbuildtag]$VERSION_TAG")
+                Write-Host($VERSION_TAG)
+          # Package a project
+          - task: NuGetCommand@2
+            displayName: Generate the .nupkg
+            inputs:
+              command: pack
+              versioningScheme: byEnvVar
+              versionEnvVar: '$(VERSION_TAG)'
+              configuration: '$(buildConfiguration)'
+              packagesToPack: '$(libProject)/*.csproj'
+              packDestination: '$(Build.ArtifactStagingDirectory)'
+  - stage: Publish
+    displayName: Publish package to Azure Devops Artifacts
+    condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+    jobs:
+    - job: Authenticate
+      displayName: NuGet Authentication on private feed
+      steps:
+        - task: NuGetAuthenticate@0
+          inputs:
+            nuGetServiceConnections: '$(feed)'
+    - job: PublishArtifact
+      displayName: Push to Azure Artifacts
+      steps:
+        # Restore from an feed scoped feed in the same feed
+        - task: NuGetCommand@2
+          name: Restore
+          displayName: Nuget Restore
+          inputs:
+            command: restore
+            feedsToUse: select
+            vstsFeed: '$(feed)'
+            restoreSolution: '$(solution)'
+        # PS: Azure Artifacts don't supports .snupkg symbols file
+        - task: PublishSymbols@2
+          displayName: Publish the symbols *.pdb to Azure Artifacts
+          inputs:
+            SearchPattern: '$(libProject)/bin/**/*.pdb'
+            SymbolServerType: TeamServices
+        # Push a project
+        - task: NuGetCommand@2
+          displayName: Publish the .nupkg
+          inputs:
+            command: push
+            versioningScheme: byEnvVar
+            versionEnvVar: '$(VERSION_TAG)'
+            packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+            feedsToUse: config
+            nugetConfigPath: '$(Build.WorkingDirectory)/nuget.config'
+            includeNuGetOrg: false
+            vstsFeed: '$(feed)'
