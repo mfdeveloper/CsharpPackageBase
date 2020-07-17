@@ -70,14 +70,7 @@ stages:
     displayName: Publish package to Azure Devops Artifacts
     condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
     jobs:
-    - job: Authenticate
-      displayName: NuGet Authentication on private feed
-      steps:
-        - task: NuGetAuthenticate@0
-          inputs:
-            nuGetServiceConnections: '$(feed)'
-    - job: PublishArtifact
-      displayName: Push to Azure Artifacts
+    - job: AuthenticateAndPublish
       steps:
         # Restore from an feed scoped feed in the same feed
         - task: NuGetCommand@2
@@ -88,14 +81,17 @@ stages:
             feedsToUse: select
             vstsFeed: '$(feed)'
             restoreSolution: '$(solution)'
+        - task: NuGetAuthenticate@0
+          name: Authenticate
+          displayName: NuGet Authentication on private feed
         # PS: Azure Artifacts don't supports .snupkg symbols file
         - task: PublishSymbols@2
           displayName: Publish the symbols *.pdb to Azure Artifacts
           inputs:
             SearchPattern: '$(libProject)/bin/**/*.pdb'
             SymbolServerType: TeamServices
-        # Push a project
         - task: NuGetCommand@2
+          name: PublishNupkg
           displayName: Publish the .nupkg
           inputs:
             command: push
@@ -104,5 +100,6 @@ stages:
             packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
             feedsToUse: config
             nugetConfigPath: '$(Build.WorkingDirectory)/nuget.config'
+            allowPackageConflicts: false
             includeNuGetOrg: false
             vstsFeed: '$(feed)'
