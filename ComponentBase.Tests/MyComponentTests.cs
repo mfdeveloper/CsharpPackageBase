@@ -10,10 +10,10 @@ namespace ComponentBase.Tests
         }
 
         [Test]
-        public void Test1()
+        public void TestIfMethodReturnAString()
         {
             var obj = new MyComponent();
-            Assert.AreEqual(obj.Method(), "This is a method");
+            Assert.AreEqual("This is a method", obj.Method());
         }
     }
 }
