@@ -17,35 +17,64 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   feed: 'optiblast'
+  dotnetCoreVersion: 3.1.x
 
 stages:
-  - stage: Test
-    displayName: Run tests
-    jobs:
-      - job: UnitTest
-        displayName: Unit tests
-        steps:
-          - task: VSTest@2
-            inputs:
-              platform: '$(buildPlatform)'
-              configuration: '$(buildConfiguration)'
   - stage: Build
     displayName: Build .dll's
     jobs:
       - job: Build
         displayName: DotNetCore build
         steps:
-          - task: DotNetCoreCLI@2
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core sdk'
             inputs:
-              command: 'build'
+              packageType: sdk
+              version: '$(dotnetCoreVersion)'
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+          - task: PowerShell@2
+            displayName: 'Install paket and dependencies'
+            inputs:
+              targetType: inline
+              script: |
+                dotnet tool restore --add-source https://api.nuget.org/v3/index.json
+                dotnet paket restore
+                dotnet paket install
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core sdk'
+            inputs:
+              packageType: sdk
+              version: '$(dotnetCoreVersion)'
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+          # Restore from an feed scoped feed in the same feed
+          - task: NuGetCommand@2
+            name: Restore
+            displayName: Nuget Restore
+            inputs:
+              command: restore
+              feedsToUse: config
+              nugetConfigPath: 'nuget.config'
+              vstsFeed: '$(feed)'
+              restoreSolution: '$(solution)'
+          - task: DotNetCoreCLI@2
+            displayName: Run tests
+            inputs:
+              command: test
+              arguments: '--no-restore'
+          - task: DotNetCoreCLI@2
+            displayName: Build .sln solution
+            inputs:
+              command: build
               configuration: '$(buildConfiguration)'
+              projects: '$(solution)'
+              arguments: '--no-restore'
   - stage: GeneratePackage
     displayName: Create Nuget .nupkg package
     dependsOn: Build
     condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
     jobs:
       - job: Pack
-        displayName: DotNetCore build
+        displayName: Package the component
         steps:
           - task: PowerShell@2
             displayName: Set last tag to environment variable
@@ -71,6 +100,7 @@ stages:
     condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
     jobs:
     - job: AuthenticateAndPublish
+      displayName: Publish to Azure Artifacts
       steps:
         # Restore from an feed scoped feed in the same feed
         - task: NuGetCommand@2
@@ -78,7 +108,8 @@ stages:
           displayName: Nuget Restore
           inputs:
             command: restore
-            feedsToUse: select
+            feedsToUse: config
+            nugetConfigPath: 'nuget.config'
             vstsFeed: '$(feed)'
             restoreSolution: '$(solution)'
         - task: NuGetAuthenticate@0
