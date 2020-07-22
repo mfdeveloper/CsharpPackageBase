@@ -27,11 +27,11 @@ stages:
         displayName: DotNetCore build
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core sdk'
+            displayName: Use .NET Core sdk
             inputs:
               packageType: sdk
               version: '$(dotnetCoreVersion)'
-              installationPath: $(Agent.ToolsDirectory)/dotnet
+              installationPath: '$(Agent.ToolsDirectory)/dotnet'
           - task: PowerShell@2
             displayName: 'Install paket and dependencies'
             inputs:
@@ -41,11 +41,11 @@ stages:
                 dotnet paket restore
                 dotnet paket install
           - task: UseDotNet@2
-            displayName: 'Use .NET Core sdk'
+            displayName: Use .NET Core sdk
             inputs:
               packageType: sdk
               version: '$(dotnetCoreVersion)'
-              installationPath: $(Agent.ToolsDirectory)/dotnet
+              installationPath: '$(Agent.ToolsDirectory)/dotnet'
           # Restore from an feed scoped feed in the same feed
           - task: NuGetCommand@2
             name: Restore
@@ -53,7 +53,7 @@ stages:
             inputs:
               command: restore
               feedsToUse: config
-              nugetConfigPath: 'nuget.config'
+              nugetConfigPath: nuget.config
               vstsFeed: '$(feed)'
               restoreSolution: '$(solution)'
           - task: DotNetCoreCLI@2
@@ -71,11 +71,11 @@ stages:
   - stage: GeneratePackage
     displayName: Create Nuget .nupkg package
     dependsOn: Build
-    condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
     jobs:
       - job: Pack
         displayName: Package the component
         steps:
+          # Create a ENV variable with latest Git tag
           - task: PowerShell@2
             displayName: Set last tag to environment variable
             inputs:
@@ -95,8 +95,16 @@ stages:
               configuration: '$(buildConfiguration)'
               packagesToPack: '$(libProject)/*.csproj'
               packDestination: '$(Build.ArtifactStagingDirectory)'
+              includeSymbols: true
+          # Publish the generated file like a pipeline artifact
+          - task: PublishBuildArtifacts@1
+            displayName: Publish .nupkg like a pipeline artifact
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: '$(libProject).$(VERSION_TAG)'
+
   - stage: Publish
-    displayName: Publish package to Azure Devops Artifacts
+    displayName: Publish package to Azure Devops Artifacts feed
     condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
     jobs:
     - job: AuthenticateAndPublish
@@ -115,7 +123,7 @@ stages:
         - task: NuGetAuthenticate@0
           name: Authenticate
           displayName: NuGet Authentication on private feed
-        # PS: Azure Artifacts don't supports .snupkg symbols file
+        # PS: Azure Artifacts don't supports ".snupkg" symbols file
         - task: PublishSymbols@2
           displayName: Publish the symbols *.pdb to Azure Artifacts
           inputs:
@@ -128,9 +136,10 @@ stages:
             command: push
             versioningScheme: byEnvVar
             versionEnvVar: '$(VERSION_TAG)'
-            packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+            packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;$(Build.ArtifactStagingDirectory)/**/*.snupkg'
             feedsToUse: config
+            nuGetFeedType: internal
             nugetConfigPath: '$(Build.WorkingDirectory)/nuget.config'
-            allowPackageConflicts: false
+            publishVstsFeed: '$(feed)'
+            allowPackageConflicts: true
             includeNuGetOrg: false
-            vstsFeed: '$(feed)'
