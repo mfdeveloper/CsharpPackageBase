@@ -32,14 +32,8 @@ stages:
               packageType: sdk
               version: '$(dotnetCoreVersion)'
               installationPath: '$(Agent.ToolsDirectory)/dotnet'
-          - task: PowerShell@2
+          - task: PaketRestore@0
             displayName: 'Install paket and dependencies'
-            inputs:
-              targetType: inline
-              script: |
-                dotnet tool restore --add-source https://api.nuget.org/v3/index.json
-                dotnet paket restore
-                dotnet paket install
           - task: UseDotNet@2
             displayName: Use .NET Core sdk
             inputs:
