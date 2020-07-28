@@ -5,6 +5,7 @@ VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{39BC1193-8B28-46D4-A7C4-169B1BD0BE1E}"
 	ProjectSection(SolutionItems) = preProject
+		ComponentBase\ComponentBase.csproj.paket.template = ComponentBase\ComponentBase.csproj.paket.template
 		paket.dependencies = paket.dependencies
 	EndProjectSection
 EndProject
@@ -16,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
 		nuget.config = nuget.config
 		README.md = README.md
 	EndProjectSection
