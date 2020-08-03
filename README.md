@@ -126,6 +126,8 @@ Your project folders structure should be:
 
 ## Testing your package locally
 
+### Create a local feed "server"
+
 1. After [generated the `.nupkg`](#generating-package-nupkg) file, create a folder accessible to you (local directory or network share) as package repo:
 
     Publish the package to local repo using `nuget add`:
@@ -133,7 +135,12 @@ Your project folders structure should be:
     ```bash
       nuget add [my-component.{version-number}].nupkg -source [your/local-repo/directory]
     ```
-2. Using [Paket](https://fsprojects.github.io/Paket/index.html), add your local folder like a `source` to the `paket.dependencies` file, in a project/application that will use this package like a dependency:
+
+### Add the package/component to a application 
+
+**Using [Paket](https://fsprojects.github.io/Paket/index.html)**
+
+2. Add your local folder like a `source` to the `paket.dependencies` file, in a project/application that will use this package like a dependency:
 
    ```bash
     source D:\source\nuget_repo
@@ -143,26 +150,34 @@ Your project folders structure should be:
     # Paket supports relative directory to the paket.dependencies too
     source directory/relative/to/paket.dependencies
    ```
-  
-   If your destiny project/application uses only [Nuget](https://www.nuget.org) like a package manager (without **`Paket`**), you can add the nuget repo folder mentioned above with **Visual Studio**:
+   > **PS:** Pay attention to avoid commit this file with the `my/local/path` to your CVS repository (like git). This is only to local tests.
 
-   ![component-local-source-folder](images/component-local-source.png)
+   > If you wish add a commit with the hardcoded path, add a common directory for everyone, for example: `C:\Program Files\Microsoft SDK\NuGetLocal`
 
-   For more information, see these tutorials:
-
-   - [Testing NuGet packages locally](https://blog.verslu.is/nuget/testing-nuget-packages-locally)
-   - [Creating and using a local NuGet package repository](https://medium.com/@churi.vibhav/creating-and-using-a-local-nuget-package-repository-9f19475d6af8)
-
+3. Add the **packageId** like a dependency into `paket.dependencies` file of your application:
+   
+    ![component-packageid-dependency](images/component-packageid-dependency.png)
 
 ## Publish to Azure Devops/Artifacts
 
-1. Restore the project to provide authentication
+**Using [Nuget](https://www.nuget.org)**
+
+4. If your destiny project/application uses only [Nuget](https://www.nuget.org) like a package manager (without **`Paket`**), you can add the nuget repo folder mentioned above with **Visual Studio**:
+
+    ![component-local-source-folder](images/component-local-source.png)
+
+    For more information, see these tutorials:
+
+    - [Testing NuGet packages locally](https://blog.verslu.is/nuget/testing-nuget-packages-locally)
+    - [Creating and using a local NuGet package repository](https://medium.com/@churi.vibhav/creating-and-using-a-local-nuget-package-repository-9f19475d6af8)
+
+5. Restore the project to provide authentication
 
     ```bash
       nuget restore
     ```
 
-2. Push to the **Azure Artifacts** feed
+6. Push to the **Azure Artifacts** feed
 
     ```bash
       # See the nuget.config file <packageSources> tag
@@ -171,28 +186,59 @@ Your project folders structure should be:
 
 ## Install remote package to an application
 
-1. Using [Paket](https://fsprojects.github.io/Paket/index.html), add your **remote feed URL** like a `source` to the `paket.dependencies` file, in a project/application that will use this package like a dependency:
+**Using [Paket](https://fsprojects.github.io/Paket/index.html)**
+
+1. Add your **remote feed URL** like a `source` to the `paket.dependencies` file, in a project/application that will use this package like a dependency:
 
    ```bash
-    source https://pkgs.dev.azure.com/opitblast/_packaging/opitblast/nuget/v3/index.json
+    # [organization]: Your organization in Azure Devops
+    # [feed]: Your feed/server name, created in Azure Artifacts
+    source https://pkgs.dev.azure.com/[organization]/_packaging/[feed]/nuget/v3/index.json
 
     # Paket supports relative directory to the paket.dependencies too
     source directory/relative/to/paket.dependencies
    ```
 
 2. Add the **packageId** like a dependency into `paket.dependencies` file of your application:
+
+  ```bash
+  # [YourAppProject]: Is project name inside of the solution, that to use this dependency like a reference
+
+  ## Using dotnet core
+  dotnet paket add --project [YourAppProject]/[YourAppProject].csproj {YourComponent.PackageIdName}
+
+  ## Using .NET Framework
+  .\.paket\paket.exe add --project [YourAppProject]/[YourAppProject].csproj {YourComponent.PackageIdName}
+  ```
   
-    ![component-packageid-dependency](images/component-packageid-dependency.png)
- 
-    If your destiny project/application uses only [Nuget](https://www.nuget.org) like a package manager (without **`Paket`**), you can add the **remote feed URL** mentioned above with **Visual Studio**:
+  As result will be added in the `paket.dependencies` file: 
+
+  ![component-packageid-dependency](images/component-packageid-dependency.png)
+
+  And in the `[YourComponent]/paket.references` file:
+
+  ![component-packageid-reference](images/component-packageid-reference.png)
+
+**Using [Nuget](https://www.nuget.org)**
+
+3. If your destiny project/application uses only [Nuget](https://www.nuget.org) like a package manager (without **`Paket`**), you can add the **remote feed URL** mentioned above with **Visual Studio**:
 
     ![component-remote-source](images/component-remote-source.png)
 
     Where:
 
+    - **[my-organization]**: The name of the remote feed/server
     - **[organization]**: replace with your organization name defined in Azure Devops
     - **[feed]**: replace with your private feed (by organization or project) where the package that will be used like an dependency was uploaded.
 
     For more information, see this official Microsoft tutorial:
 
    - [Visual Studio Package Sources](https://docs.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio#package-sources)
+
+4. Add the **packageId** like a dependency into `package.config` or using the tag `<PackageReference>` in the `[YourComponent]\YourComponent.csproj` XML file. You can do this using **Visual Studio:** 
+
+   ![visual-studio-nuget-packages](./images/visual-studio-nuget-packages.png)
+
+> **`Right click`** on References under the component **`project => Manage Nuget Packages`**
+
+5. On the next screen, search by the **packageId** and click on **`Install`** button
