@@ -6,13 +6,14 @@
 	"recommendations": [
 		"emmanuelbeziat.vscode-great-icons",
 		"editorconfig.editorconfig",
-		"hjdarnel.dotnet-test-explorer",
 		"fernandoescolar.vscode-solution-explorer",
 		"ms-dotnettools.csharp",
 		"ionide.ionide-paket",
 		"eridem.vscode-nupkg",
 		"ms-azure-devops.azure-pipelines",
-		"k--kato.docomment"
+		"k--kato.docomment",
+		"hbenl.vscode-test-explorer",
+		"derivitec-ltd.vscode-dotnet-adapter"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": [

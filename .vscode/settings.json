@@ -1,4 +1,3 @@
 {
-    "dotnet-test-explorer.testProjectPath": "./ComponentBase.Tests",
-    "dotnet-test-explorer.enableTelemetry": false
+    "dotnetCoreExplorer.searchpatterns": "**/bin/**/*.{dll,exe}"
 }

@@ -4,7 +4,7 @@
     <Title>Component Base</Title>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>This is a base scaffold for paket/nuget packages</Description>
     <Authors>Felipe Ferreira</Authors>

@@ -32,8 +32,14 @@ stages:
               packageType: sdk
               version: '$(dotnetCoreVersion)'
               installationPath: '$(Agent.ToolsDirectory)/dotnet'
-          - task: PaketRestore@0
-            displayName: 'Install paket and dependencies'
+          - task: PowerShell@2
+            displayName: 'Install paket CLI and dependencies'
+            inputs:
+              targetType: inline
+              script: |
+                dotnet tool install -g paket
+                paket restore
+                paket install
           - task: UseDotNet@2
             displayName: Use .NET Core sdk
             inputs:
