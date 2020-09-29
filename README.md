@@ -15,7 +15,6 @@ This is a **nuget/paket** main scaffold component to create others packages
 * ### [Paket](https://fsprojects.github.io/Paket/index.html)
   > Integrated with [Nuget](https://www.nuget.org) to manage dependencies, with more clear files and allow use **Git** dependencies
 
-
 ## Getting Started
 
 ### 1. Install [.NET Core](https://cakebuild.net/docs/tutorials/getting-started)
@@ -34,7 +33,7 @@ This is a **nuget/paket** main scaffold component to create others packages
 Use [Chocolatey](https://chocolatey.org/)
 
 ```bash
-  choco install nuget.commandline
+choco install nuget.commandline
 ```
 
 #### 2.1 Install [Azure Artifacts Credential Provider](https://github.com/microsoft/artifacts-credprovider)
@@ -53,36 +52,38 @@ Use [Chocolatey](https://chocolatey.org/)
 Use [.NET Core tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools#install-a-local-tool) to install **paket** command line locally
 
 ```bash
-  dotnet tool restore
+dotnet tool install -g paket
 ```
+
+**PS:** Install globally if you will use paket in others projects. You can use globally also if your project not use .NET Core.
 
 #### 3.1 Install Azure pipelines CLI (OPTIONAL) 
 
 Use [Chocolatey](https://chocolatey.org/)
 
 ```bash
-  # Install base Azure CLI (command line)
-  choco install azure-cli
+# Install base Azure CLI (command line)
+choco install azure-cli
 
-  # Install Azure Devops extensions
-  az extension add --name azure-devops
+# Install Azure Devops extensions
+az extension add --name azure-devops
 ```
 
 ### 4. Install all DEPENDENCIES and restore references
 
 ```bash
-  dotnet paket restore
-  dotnet restore
+paket restore
+dotnet restore
 ```
 
 ### 5. Build and test the solution
 
 ```bash
-  # Build the solution
-  dotnet build
+# Build the solution
+dotnet build
 
-  # Run all tests
-  dotnet test
+# Run all tests
+dotnet test
 ```
 
 ## Project structure
@@ -115,14 +116,22 @@ Your project folders structure should be:
 2. Genarate the ```.nupkg``` file
 
     ```bash
-      # Pack your component to the path nugets/*.nupkg
-      dotnet pack --include-symbols --configuration Release --output nugets [your-component-project]
+    # Pack your component to the path nugets/*.nupkg
+    dotnet pack --include-symbols --configuration Release --output nugets [your-component-project]
     ```
     > **PS:** If you not pass the **_--outputs_** flag, the ```.nupkg``` file is generated in: ```[your-component-project]/bin/Release``` by default
 
     Or use Visual Studio and right click on your project component under Solution explorer, and click **Pack**.
 
     ![component-pack-nupkg](./images/component-pack.png)
+
+     ### Error "Pack Task"
+
+    If you got a `Pack task` error with .NET Core CLI or in **Visual Studio**, use [`Paket pack`](https://fsprojects.github.io/Paket/paket-pack.html) command:
+
+    ```bash
+    paket pack --template [your-component-project]\[your-component-project].csproj.paket.template --build-config Release --symbols nugets
+    ```
 
 ## Testing your package locally
 
@@ -133,7 +142,7 @@ Your project folders structure should be:
     Publish the package to local repo using `nuget add`:
 
     ```bash
-      nuget add [my-component.{version-number}].nupkg -source [your/local-repo/directory]
+    nuget add [my-component.{version-number}].nupkg -source [your/local-repo/directory]
     ```
 
 ### Add the package/component to a application 
@@ -174,14 +183,14 @@ Your project folders structure should be:
 5. Restore the project to provide authentication
 
     ```bash
-      nuget restore
+    nuget restore
     ```
 
 6. Push to the **Azure Artifacts** feed
 
     ```bash
-      # See the nuget.config file <packageSources> tag
-      nuget push -Source "[your-feed-name]" -ApiKey az [path/to/nupkg-file].nupkg
+    # See the nuget.config file <packageSources> tag
+    nuget push -Source "[your-feed-name]" -ApiKey az [path/to/nupkg-file].nupkg
     ```
 
 ## Install remote package to an application
@@ -205,7 +214,7 @@ Your project folders structure should be:
   # [YourAppProject]: Is project name inside of the solution, that to use this dependency like a reference
 
   ## Using dotnet core
-  dotnet paket add --project [YourAppProject]/[YourAppProject].csproj {YourComponent.PackageIdName}
+  paket add --project [YourAppProject]/[YourAppProject].csproj {YourComponent.PackageIdName}
 
   ## Using .NET Framework
   .\.paket\paket.exe add --project [YourAppProject]/[YourAppProject].csproj {YourComponent.PackageIdName}
@@ -242,3 +251,7 @@ Your project folders structure should be:
 > **`Right click`** on References under the component **`project => Manage Nuget Packages`**
 
 5. On the next screen, search by the **packageId** and click on **`Install`** button
+
+## Problems and workarounds
+
+See the wiki pages in: [CsharpComponentBase Wiki](https://dev.azure.com/opitblast/CsharpComponentBase/_wiki/wikis/CsharpComponentBase.wiki/1/Known-issues)
