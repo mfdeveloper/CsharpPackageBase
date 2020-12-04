@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using FluentAssertions;
+using ComponentBase.Core;
 
 namespace ComponentBase.Tests
 {

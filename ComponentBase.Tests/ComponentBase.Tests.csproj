@@ -5,7 +5,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ComponentBase\ComponentBase.csproj" />
+    <ProjectReference Include="..\ComponentBase.Core\ComponentBase.Core.csproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ComponentBase
+namespace ComponentBase.Core
 {
     public class MyComponent
     {
