@@ -119,7 +119,7 @@ Your project folders structure should be:
     # Run all tests
     dotnet test
     ```
-2. Genarate the ```.nupkg``` file
+2. Generate the ```.nupkg``` file
 
     ```bash
     # Pack your component to the path nupkg/*.nupkg
@@ -141,7 +141,28 @@ Your project folders structure should be:
 
 ## Testing your package locally
 
-### Create a local feed "server"
+### Method 1: Use `paket.local` file (_recommended_)
+
+The preferrable option is create a `paket.local` file in your consumer project/application, 
+and add the source path of your package. The `source` property could be a path that contains a **`.nupkg`** file. In this case, you need build and pack your component first:
+
+**- Build/Pack your component project first**
+
+```bash
+# Use Visual Studio: Build => Build Solution
+# or use dotnet core CLI
+dotnet build
+```
+
+**- Create the `paket.local` file in your consumer root solution project/application**
+
+**_paket.local_**
+```bash
+nuget [my-component-id] -> source [my-component-solution]\[my-component-project]\[nupkg-folder] version [my-component-version]
+```
+> For more information, see the official documentation: [The paket.local file](https://fsprojects.github.io/Paket/local-file.html)
+
+### Method 2: Create a local feed "server"
 
 1. After [generated the `.nupkg`](#generating-package-nupkg) file, create a folder accessible to you (local directory or network share) as package repo:
 
@@ -151,7 +172,7 @@ Your project folders structure should be:
     nuget add [my-component.{version-number}].nupkg -source [your/local-repo/directory]
     ```
 
-### Add the package/component to a application 
+#### Add the package/component to a application 
 
 **Using [Paket](https://fsprojects.github.io/Paket/index.html)**
 
