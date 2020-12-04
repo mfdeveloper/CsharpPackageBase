@@ -55,7 +55,13 @@ Use [.NET Core tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-
 dotnet tool install -g paket
 ```
 
-**PS:** Install globally if you will use paket in others projects. You can use globally also if your project not use .NET Core.
+If you got any error using `paket` with **.NET Core**, try install using chocolatey
+
+```bash
+choco install paket
+```
+
+> **PS:** Install globally if you will use paket in others projects. You can use globally also if your project not use .NET Core.
 
 #### 3.1 Install Azure pipelines CLI (OPTIONAL) 
 
@@ -96,8 +102,8 @@ Your project folders structure should be:
    - 📂 __ComponentBase.Tests__
       > The project with Unit and/or Integration tests
      - 📄 [ComponentBase.Tests.csproj](ComponentBase.Tests/ComponentBase.Tests.csproj)
-   - 📂 __ComponentBase__
-      > The project with your library/component
+   - 📂 __ComponentBase.Core__
+      > The project with your library/component core
      - 📄 [ComponentBaseComponent.csproj](ComponentBaseComponent/ComponentBaseComponent.csproj)
   
 ![component-directories-explanation](./images/component-tree-explanation.png)
@@ -116,8 +122,8 @@ Your project folders structure should be:
 2. Genarate the ```.nupkg``` file
 
     ```bash
-    # Pack your component to the path nugets/*.nupkg
-    dotnet pack --include-symbols --configuration Release --output nugets [your-component-project]
+    # Pack your component to the path nupkg/*.nupkg
+    dotnet pack --include-symbols --configuration Release --output .\nupkg [your-component-project]
     ```
     > **PS:** If you not pass the **_--outputs_** flag, the ```.nupkg``` file is generated in: ```[your-component-project]/bin/Release``` by default
 
@@ -130,7 +136,7 @@ Your project folders structure should be:
     If you got a `Pack task` error with .NET Core CLI or in **Visual Studio**, use [`Paket pack`](https://fsprojects.github.io/Paket/paket-pack.html) command:
 
     ```bash
-    paket pack --template [your-component-project]\[your-component-project].csproj.paket.template --build-config Release --symbols nugets
+    paket pack --template [your-component-project]\[your-component-project].csproj.paket.template --build-config Release --symbols .\nupkg
     ```
 
 ## Testing your package locally

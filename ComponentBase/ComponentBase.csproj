@@ -3,13 +3,15 @@
   <PropertyGroup>
     <Title>Component Base</Title>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>This is a base scaffold for paket/nuget packages</Description>
     <Authors>Felipe Ferreira</Authors>
     <Company>O-Pitblast</Company>
     <PackageTags>component, component-scaffold, nuget-component, dotnet-package</PackageTags>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <SignAssembly>false</SignAssembly>
     <!--Symbols for debug the .dll of this package-->
@@ -22,4 +24,7 @@
     <DocumentationFile></DocumentationFile>
   </PropertyGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
+  <Target Name="Clean">
+    <RemoveDir Directories="./nupkg" />
+  </Target>
 </Project>

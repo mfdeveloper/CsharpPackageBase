@@ -1,5 +1,6 @@
 group Test
-  nunit
-  NUnit3TestAdapter
-  Microsoft.NET.Test.Sdk
-  NUnit.ConsoleRunner
+nunit
+NUnit3TestAdapter
+Microsoft.NET.Test.Sdk
+NUnit.ConsoleRunner
+FluentAssertions

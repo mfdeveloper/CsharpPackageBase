@@ -1,12 +1,12 @@
 source https://api.nuget.org/v3/index.json
 
 framework: auto-detect
-nuget NETStandard.Library
 
 group Test
 
   source https://api.nuget.org/v3/index.json
 
+  nuget FluentAssertions
   nuget Microsoft.NET.Test.Sdk
   nuget nunit
   nuget NUnit3TestAdapter

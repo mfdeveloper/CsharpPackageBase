@@ -199,7 +199,7 @@ PublishScripts/
 .ci/**/*-schema.json
 
 # NuGet
-nugets/
+nupkg/
 *.nupkg
 # NuGet Symbol Packages
 *.snupkg

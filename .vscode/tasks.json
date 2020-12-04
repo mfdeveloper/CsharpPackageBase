@@ -7,7 +7,7 @@
           "type": "process",
           "args": [
               "build",
-              "${workspaceFolder}/ComponentBase/ComponentBase.csproj",
+              "${workspaceFolder}/ComponentBase.Core/ComponentBase.Core.csproj",
               "/property:GenerateFullPaths=true",
               "/consoleloggerparameters:NoSummary"
           ],
