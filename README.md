@@ -1,6 +1,5 @@
 # ComponentBase Component/Library
 
-[![Build Status](https://dev.azure.com/opitblast/CsharpComponentBase/_apis/build/status/CsharpComponentBase?branchName=master)](https://dev.azure.com/opitblast/CsharpComponentBase/_build/latest?definitionId=20&branchName=master)
 
 This is a **nuget/paket** main scaffold component to create others packages
 
@@ -281,4 +280,4 @@ nuget [my-component-id] -> source [my-component-solution]\[my-component-project]
 
 ## Problems and workarounds
 
-See the wiki pages in: [CsharpComponentBase Wiki](https://dev.azure.com/opitblast/CsharpComponentBase/_wiki/wikis/CsharpComponentBase.wiki/1/Known-issues)
+See the wiki pages in: [CsharpPackagetBase Wiki](https://github.com/mfdeveloper/CsharpPackageBase/wiki/Known-issues)
